@@ -3,6 +3,7 @@ package com.cursor.library;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class BookRepo {
@@ -26,6 +27,19 @@ public class BookRepo {
         return new ArrayList<>(books.values());
     }
 
+    public List<Book> getAllPaged(int limit, int offset) {
+        return books.values().stream()
+                .skip(offset)
+                .limit(limit)
+                .collect(Collectors.toList());
+    }
+
+    public List<Book> getAllByAuthor(String author) {
+        return getAll().stream()
+                .filter(book -> book.getAuthor().equals(author))
+                .collect(Collectors.toList());
+    }
+
     public Book saveBook(
             final String name,
             final String author,
@@ -34,6 +48,10 @@ public class BookRepo {
     ) {
         final Book newBook = new Book(UUID.randomUUID().toString(), name, author, year, genre);
         return books.put(newBook.getId(), newBook);
+    }
+
+    public Book updateBook(String id, Book book) {
+        return books.replace(id, book);
     }
 
     public Book findById(String bookId) {
